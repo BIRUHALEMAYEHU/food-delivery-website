@@ -1,21 +1,22 @@
 <?php
-  include '../layout/headerLayout.php'
+  include __DIR__ . '/../layout/headerLayout.php'
 ?>
 
 <?php
-
     $role = $_GET['role'];
-
+    if (!in_array($role, ['customer', 'restaurant', 'delivery'])) {
+        header("Location: ../onboarding.php");
+        exit();
+    }
 ?>
+
 <section class="a-nav">
     <div class="buttons is-link none">
         <button id="themeToggle" class="button is-light none">
             <span class="icon">
-                    <i class="fas fa-moon"></i>
-
-             </span>
+                <i class="fas fa-moon"></i>
+            </span>
         </button>
-                            
     </div>
 </section>
     
@@ -29,20 +30,20 @@
               <span class="icon-text">
                 <span class="title is-3 has-text-weight-bold">Sweet Bite</span>
               </span>
-              <p class="subtitle is-5 mt-2"><?php echo $role ?> Sign up</p>
+              <p class="subtitle is-5 mt-2"><?php echo ucfirst($role) ?> Sign up</p>
             </div>
             
-            <form action="./signup-pros.php" method="POST" onsubmit="return validatesignupForm()" >
-
-            <div class="field">
+            <form action="./signup-pros.php" method="POST" onsubmit="return validateSignupForm()">
+              <div class="field">
                 <label class="label">Full Name</label>
                 <div class="control has-icons-left">
-                  <input class="input" type="text" name="fname" placeholder="e.g. jon doe" required>
+                  <input class="input" type="text" name="fname" placeholder="e.g. John Doe" required>
                   <span class="icon is-small is-left">
                     <i class="fas fa-user"></i>
                   </span>
                 </div>
               </div>
+
               <div class="field">
                 <label class="label">Email</label>
                 <div class="control has-icons-left">
@@ -52,6 +53,7 @@
                   </span>
                 </div>
               </div>
+
               <div class="field">
                 <label class="label">Password</label>
                 <div class="control has-icons-left">
@@ -60,22 +62,75 @@
                     <i class="fas fa-lock"></i>
                   </span>
                 </div>
-                
               </div>
+
+              <?php if ($role === 'restaurant'): ?>
+              <div class="field">
+                <label class="label">Restaurant Name</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="text" name="restaurant_name" placeholder="e.g. Tasty Bites" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-store"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Phone Number</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="tel" name="phone" placeholder="e.g. +1234567890" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-phone"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Address</label>
+                <div class="control has-icons-left">
+                  <textarea class="textarea" name="address" placeholder="Enter restaurant address" required></textarea>
+                </div>
+              </div>
+              <?php endif; ?>
+
+              <?php if ($role === 'delivery'): ?>
+              <div class="field">
+                <label class="label">Phone Number</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="tel" name="phone" placeholder="e.g. +1234567890" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-phone"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Vehicle Type</label>
+                <div class="control has-icons-left">
+                  <div class="select is-fullwidth">
+                    <select name="vehicle_type" required>
+                      <option value="">Select vehicle type</option>
+                      <option value="bicycle">Bicycle</option>
+                      <option value="motorcycle">Motorcycle</option>
+                      <option value="car">Car</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <?php endif; ?>
               
-             
               <div class="field">
                 <button class="button is-primary is-fullwidth" type="submit">
                   <span class="icon">
-                    <i class="fas fa-sign-in-alt"></i>
+                    <i class="fas fa-user-plus"></i>
                   </span>
                   <span>Sign Up</span>
                 </button>
               </div>
-              <input type="text" hidden name="role" value="<?php echo $role ?>">
+              <input type="hidden" name="role" value="<?php echo $role ?>">
             </form>
             <div class="has-text-centered">
-              <p class="is-size-7">Already have an account? <a href="./login.php">login</a></p>
+              <p class="is-size-7">Already have an account? <a href="./login.php">Login</a></p>
             </div>
           </div>
         </div>
@@ -84,71 +139,93 @@
   </div>
 </section>
 
-
 <script>
-  function validatesignupForm() {
-    
-    const name = document.querySelector('input[name="name"]').value.trim();
+  function validateSignupForm() {
+    const fname = document.querySelector('input[name="fname"]').value.trim();
     const email = document.querySelector('input[name="email"]').value.trim();
     const password = document.querySelector('input[name="password"]').value;
+    const role = document.querySelector('input[name="role"]').value;
     
-    const emailPattern = /^[^ ]+@[^ ]+\.[a-z]$/;
-    const namePattern = /^[A-Za-z\s]+$/; // 
+    const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,}$/;
+    const namePattern = /^[A-Za-z\s]+$/;
+    const phonePattern = /^\+?[\d\s-]{10,}$/;
 
-     if (name === "" || email === "" || password === "") 
-     {
+    // Basic validation
+    if (fname === "" || email === "" || password === "") {
       alert("All fields are required.");
       return false;
-     }
-    if (!namePattern.test(name)) {
+    }
+
+    // Name validation
+    if (!namePattern.test(fname)) {
       alert("Name can only contain letters and spaces.");
       return false;
     }
-    if (name.length < 3) {
+    if (fname.length < 3) {
       alert("Name must be at least 3 characters.");
       return false;
     }
-    if (email === "") {
-      alert("Email is required.");
-      return false;
-    }
-    if (password === "") {
-      alert("Password is required.");
-      return false;
-    }
-    if (name.length > 50) {
+    if (fname.length > 50) {
       alert("Name must be less than 50 characters.");
       return false;
     }
-    if (email.length > 50) {
-      alert("Email must be less than 50 characters.");
-      return false;
-    }
-    
-    if (password.length > 50) {
-      alert("Password must be less than 50 characters.");
-      return false;
-    }
-    if (email.length < 5) {
-      alert("Email must be at least 5 characters.");
-      return false;
-    }
 
+    // Email validation
     if (!emailPattern.test(email)) {
       alert("Please enter a valid email address.");
       return false;
     }
+    if (email.length < 5 || email.length > 50) {
+      alert("Email must be between 5 and 50 characters.");
+      return false;
+    }
 
+    // Password validation
     if (password.length < 6) {
       alert("Password must be at least 6 characters.");
       return false;
+    }
+    if (password.length > 50) {
+      alert("Password must be less than 50 characters.");
+      return false;
+    }
+
+    // Role-specific validation
+    if (role === 'restaurant') {
+      const restaurantName = document.querySelector('input[name="restaurant_name"]').value.trim();
+      const phone = document.querySelector('input[name="phone"]').value.trim();
+      const address = document.querySelector('textarea[name="address"]').value.trim();
+
+      if (!restaurantName || !phone || !address) {
+        alert("All restaurant fields are required.");
+        return false;
+      }
+
+      if (!phonePattern.test(phone)) {
+        alert("Please enter a valid phone number.");
+        return false;
+      }
+    }
+
+    if (role === 'delivery') {
+      const phone = document.querySelector('input[name="phone"]').value.trim();
+      const vehicleType = document.querySelector('select[name="vehicle_type"]').value;
+
+      if (!phone || !vehicleType) {
+        alert("All delivery fields are required.");
+        return false;
+      }
+
+      if (!phonePattern.test(phone)) {
+        alert("Please enter a valid phone number.");
+        return false;
+      }
     }
 
     return true;
   }
 </script>
 
-
 <?php
-  include '../layout/footerLayout.php'
+  include __DIR__ . '/../layout/footerLayout.php'
 ?>

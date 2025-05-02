@@ -27,8 +27,31 @@
               <p class="subtitle is-5 mt-2">Sign in to your account</p>
             </div>
 
+            <?php if (isset($_GET['error'])): ?>
+                <div class="notification is-<?= $_GET['error'] === 'session_expired' ? 'warning' : 'danger' ?> is-light mb-4">
+                    <button class="delete"></button>
+                    <?php
+                        switch ($_GET['error']) {
+                            case 'session_expired':
+                                echo 'Your session has expired. Please log in again.';
+                                break;
+                            case 'wrong_password':
+                                echo 'Incorrect password. Please try again.';
+                                break;
+                            case 'user_not_found':
+                                echo 'No account found with this email.';
+                                break;
+                            case 'invalid_role':
+                                echo 'Invalid user role. Please contact support.';
+                                break;
+                            default:
+                                echo 'An error occurred. Please try again.';
+                        }
+                    ?>
+                </div>
+            <?php endif; ?>
             
-            <form action="login-pros.php" method="POST" onsubmit="return validateLoginForm()>
+            <form action="login-pros.php" method="POST" onsubmit="return validateLoginForm()">
               <div class="field">
                 <label class="label">Email</label>
                 <div class="control has-icons-left">
@@ -74,7 +97,7 @@
     
     const email = document.querySelector('input[name="email"]').value.trim();
     const password = document.querySelector('input[name="password"]').value;
-    const emailPattern = /^[^ ]+@[^ ]+\.[a-z]$/;
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (email === "" || password === "") 
      {

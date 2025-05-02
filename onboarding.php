@@ -79,34 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Redirect after a short delay for better UX
       setTimeout(() => {
-        switch(role) {
-          case 'customer':
-            window.location.href = 'auth/customer-signup.php';
-            break;
-          case 'delivery':
-            window.location.href = 'auth/delivery-signup.php';
-            break;
-          case 'restaurant':
-            window.location.href = 'auth/restaurant-signup.php';
-            break;
-        }
+        const baseUrl = window.location.origin + '/food-delivery-website/auth/signup.php';
+        const newUrl = baseUrl + `?role=${role}`;
+        window.location.href = newUrl;
       }, 300);
     });
   });
 });
-
-const allROleBtn = document.querySelectorAll('#role-btn')
-allROleBtn.forEach((e)=>{
-  e.addEventListener('click',function(){
-    
-    const role = e.getAttribute("data-role");
-    const baseUrl = window.location.origin + '/food-delivery-website/auth/signup.php';
-    const newUrl = baseUrl + `?role=${role}`
-    window.location.href = newUrl
-
-
-  })
-})
 </script>
 
 <style>

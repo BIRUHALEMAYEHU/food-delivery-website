@@ -24,7 +24,20 @@
                     $pdo = null;
                     $stmt = null;
 
-                    header("Location: ../dashboard/home.php");
+                    // Redirect based on role
+                    switch ($user['role']) {
+                        case 'customer':
+                            header("Location: ../dashboard/customer-dashboard.php");
+                            break;
+                        case 'restaurant':
+                            header("Location: ../dashboard/restaurant-dashboard.php");
+                            break;
+                        case 'delivery':
+                            header("Location: ../dashboard/delivery-dashboard.php");
+                            break;
+                        default:
+                            header("Location: ../auth/login.php?error=invalid_role");
+                    }
                     die();
                 }else{
                     $pdo = null;

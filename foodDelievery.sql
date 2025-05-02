@@ -67,3 +67,15 @@ CREATE TABLE delivery_locations (
     FOREIGN KEY (delivery_id) REFERENCES users(id),
     FOREIGN KEY (order_id) REFERENCES orders(id)
 );
+
+CREATE TABLE delivery_profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    phone VARCHAR(20),
+    vehicle_type ENUM('bicycle', 'motorcycle', 'car'),
+    is_available BOOLEAN DEFAULT TRUE,
+    current_latitude DOUBLE,
+    current_longitude DOUBLE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
